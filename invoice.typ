@@ -48,6 +48,16 @@
 ]
 
 #let invoice_positions(invoice_info, positions) = [
+  #show table.cell.where(y: 0): strong
+  #set table(
+    stroke: (x, y) => if y == 0 or y == positions.len() or y == positions.len() + 3 {
+      (bottom: 0.7pt + black)
+    },
+    align: (x, y) => (
+      if x > 1 { right } else { left }
+    ),
+  )
+
   #let sum = positions.map(p => p.at(3)).sum()
 
   #table(
@@ -75,7 +85,7 @@
     [*Zwischensumme:*], [], [], [], [#display-amount(sum)],
     [], [], [], [], [],
     [Mehrwertsteuer:], [], [#invoice_info.vat %], [], [#display-amount(invoice_info.vat / 100.0 * sum)],
-    [*Gesamtsumme:*], [], [], [], [#display-amount((100.0 + invoice_info.vat) / 100.0 * sum)]
+    [*Gesamtsumme:*], [], [], [], [*#display-amount((100.0 + invoice_info.vat) / 100.0 * sum)*]
   )
 ]
 
@@ -88,14 +98,11 @@
 
 
 #let invoice(invoice_info, invoicing_party, recipient, positions) = [
-
   #set text(font: "JetBrains Mono", size: 10pt)
 
   #set page(
     paper: "a4",
-    header: [],
     footer: invoice_footer(invoicing_party),
-    number-align: center,
   )
 
   #show link: underline
@@ -114,17 +121,6 @@
 
 
   vereinbarungsgemäß berechne ich für meine Leistungen wie folgt:
-
-  #show table.cell.where(y: 0): strong
-  #set table(
-    stroke: (x, y) => if y == 0 or y == positions.len() or y == positions.len() + 3 {
-      (bottom: 0.7pt + black)
-    },
-    align: (x, y) => (
-      if x > 1 { right } else { left }
-    ),
-  )
-
 
   #block()
 
@@ -146,5 +142,4 @@
   #block(height: 0cm)
 
   #invoicing_party.name
-
 ]
