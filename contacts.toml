@@ -1,0 +1,25 @@
+[me]
+name = "Wilston Oreo"
+street = "Fake Str. 123"
+zip = "12345"
+city = "Berlin"
+phone = "+491234567890"
+iban = "DE1234123412341234"
+bic = "AWESOMEBANK"
+website = "https://my.site"
+email = "me@my.site"
+
+[client_a]
+name = "A nice client"
+street = "Awesome Avenue 12"
+zip = "54321"
+city = "Invoice City"
+
+[client_b]
+name = "Fun Foundation"
+zip = "5432"
+city = "Joke Town"
+street = "Prank street 42"
+country = "Parodistan"
+contact_name = "Arthur Fleck"
+contact_email = "be@funny.org"
