@@ -1,7 +1,7 @@
 #import "tr.typ": tr
 
-// Return period with begin and end from worklog
-#let period_from_worklog(worklog) = {
+/// Return period with begin and end from worklog
+#let worklog_period(worklog) = {
   let first = worklog.first().at(0).split(" ").at(0)
   let last = worklog.last().at(0).split(" ").at(0)
   if first == last {
@@ -16,7 +16,8 @@
   }
 }
 
-#let worklog(worklog) = [
+/// Create a worklog table from a worklog item
+#let worklog_table(worklog) = [
   #show link: underline
 
   #set table(
@@ -25,7 +26,7 @@
     },
   )
 
-  #let period = period_from_worklog(worklog)
+  #let period = worklog_period(worklog)
   #let sum = worklog.map(p => decimal(p.at(1))).sum()
 
   #if period.keys().contains("end") [

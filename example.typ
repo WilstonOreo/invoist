@@ -42,7 +42,7 @@
   date: "24.05.2025",
   id: "2",
   due: "14 days",
-  period: worklog.period_from_worklog(worklog_data),
+  period: worklog.worklog_period(worklog_data),
   vat: 0.0,
   invoicing_party: toml("contacts.toml").me,
   recipient: toml("contacts.toml").client_b,
@@ -57,5 +57,5 @@
 
 #pagebreak()
 
-// Attach a worklog to the invoice
-#worklog.worklog(worklog_data)
+// Attach a worklog table to the invoice
+#worklog.worklog_table(worklog_data)

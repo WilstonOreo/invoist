@@ -1,6 +1,7 @@
 
 #import "tr.typ": tr
 
+/// Display an amount
 #let display-amount(amount) = {
   if amount == none {
     return none
@@ -18,6 +19,7 @@
   }
 }
 
+/// Output address details for an invoice recipient
 #let address_details(recipient) = block(width: 12cm)[
   #recipient.name \
   #if recipient.keys().contains("contact_name") [
@@ -30,6 +32,7 @@
   ]
 ]
 
+/// Output invoice details
 #let invoice_details(invoice_info) = place(top + left, dx: 10cm)[
   #let invoicing_party = invoice_info.invoicing_party;
 
@@ -47,6 +50,7 @@
   ]
 ]
 
+/// Output payment account details
 #let invoice_account_details(invoice_info) = align(center)[#block(width: 9cm, inset: 0.5cm)[
     #let invoicing_party = invoice_info.invoicing_party;
 
@@ -58,7 +62,8 @@
   ]
 ]
 
-#let invoice_positions(invoice_info) = [
+/// Output table of invoice positions (with VAT)
+#let invoice_positions_vat(invoice_info) = [
   #let positions = invoice_info.positions;
 
   #show table.cell.where(y: 0): strong
@@ -103,7 +108,8 @@
   )
 ]
 
-#let invoice_positions_no_tax(invoice_info) = [
+/// Output table of invoice positions (no VAT)
+#let invoice_positions_no_vat(invoice_info) = [
   #let positions = invoice_info.positions;
 
   #set table(
@@ -143,6 +149,15 @@
   )
 ]
 
+#let invoice_positions(invoice_info) = [
+  #if invoice_info.keys().contains("vat") and invoice_info.vat > 0.0 {
+    invoice_positions_vat(invoice_info)
+  } else {
+    invoice_positions_no_vat(invoice_info)
+  }
+]
+
+/// Invoice header displays page number if there is more than one page
 #let invoice_header() = context [
   #align(right)[
     #let count = counter(page).final().last();
@@ -152,24 +167,14 @@
   ]
 ]
 
-
+/// Display invoicing party's details in the footer
 #let invoice_footer(invoicing_party) = [
   #align(center)[#text(7.5pt)[
       #invoicing_party.name #sym.dot.c #invoicing_party.street #sym.dot.c #invoicing_party.zip #invoicing_party.city #sym.dot.c #invoicing_party.phone #sym.dot.c #invoicing_party.email
     ]]
 ]
 
-
-#let invoice_page_style(invoice_info) = [
-  #set text(font: "JetBrains Mono", size: 10pt)
-  #show link: underline
-
-  #set page(
-    paper: "a4",
-    footer: invoice_footer(invoice_info.invoicing_party),
-  )
-]
-
+/// Create an invoice from an invoice info dict
 #let invoice(invoice_info) = [
   #show link: underline
 
@@ -198,15 +203,11 @@
 
   #block()
 
-  #if invoice_info.keys().contains("vat") and invoice_info.vat > 0.0 {
-    invoice_positions(invoice_info)
-  } else {
-    invoice_positions_no_tax(invoice_info)
-  }
+  #invoice_positions(invoice_info)
 
   #block()
 
-  #if invoice_info.vat <= 0.0 {
+  #if not invoice_info.keys().contains("vat") or invoice_info.vat <= 0.0 {
     tr("vat_note")
     block()
   }
