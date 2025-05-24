@@ -3,10 +3,11 @@
 // Dictionary for translations
 #let dict = (
   de: (
+    invoice: "Rechnung",
+    period: "Leistungszeitraum",
     date: "Datum",
     invoice_number: "Rechnungsnummer",
     invoice_due: "Zahlungsziel",
-    invoice: "Rechnung",
     salutation: "Sehr geehrte Damen und Herren,",
     declaration: "vereinbarungsgemäß berechne ich für meine Leistungen wie folgt:",
     position_name: "Bezeichnung",
@@ -23,12 +24,17 @@
     bic: "BIC",
     thank_you: "Ich bedanke mich für Ihren Auftrag und freue mich auf die weitere Zusammenarbeit.",
     closing: "Mit freundlichen Grüßen",
+    worklog: "Stundenzettel",
+    worklog_hours: "Stunden",
+    worklog_total_hours: "Gesamtstunden",
+    worklog_description: "Beschreibung",
   ),
   en: (
+    invoice: "Invoice",
+    period: "Performance period",
     date: "Date",
     invoice_number: "Invoice number",
     invoice_due: "Time for payment",
-    invoice: "Invoice",
     salutation: "Dear ladies and gentlemen,",
     declaration: "As agreed, I charge for my services as follows:",
     position_name: "Name",
@@ -46,6 +52,10 @@ The VAT is to be paid by the recipient of the service.",
     bic: "BIC",
     thank_you: "Thank you for your order and I look forward to further cooperation.",
     closing: "Best regards",
+    worklog: "Work log",
+    worklog_hours: "Hours",
+    worklog_total_hours: "Total hours",
+    worklog_description: "Description",
   ),
 )
 
@@ -159,7 +169,6 @@ The VAT is to be paid by the recipient of the service.",
 #let invoice_positions_no_tax(invoice_info) = [
   #let positions = invoice_info.positions;
 
-  #show table.cell.where(y: 0): strong
   #set table(
     stroke: (x, y) => if y == 0 or y == positions.len() or y == positions.len() + 3 {
       (bottom: 0.7pt + black)
@@ -198,6 +207,15 @@ The VAT is to be paid by the recipient of the service.",
   )
 ]
 
+#let invoice_header() = context [
+  #align(right)[
+    #let count = counter(page).final().last();
+    #if count > 1 {
+      counter(page).display()
+    }
+  ]
+]
+
 
 #let invoice_footer(invoicing_party) = [
   #align(center)[#text(7.5pt)[
@@ -206,24 +224,34 @@ The VAT is to be paid by the recipient of the service.",
 ]
 
 
-
-#let invoice(invoice_info) = [
+#let invoice_page_style(invoice_info) = [
   #set text(font: "JetBrains Mono", size: 10pt)
+  #show link: underline
 
   #set page(
     paper: "a4",
     footer: invoice_footer(invoice_info.invoicing_party),
   )
+]
 
-  #show link: underline
-
+#let invoice(invoice_info) = [
   #let t(text) = tr(invoice_info.language, text)
+  #show link: underline
 
   #address_details(invoice_info.recipient)
 
   #block(height: 3.5cm)
 
   = #t("invoice") #invoice_info.id
+
+  #if invoice_info.keys().contains("period") [
+    #let period = invoice_info.period;
+    #if period.keys().contains("end") [
+      === #t("period") #period.begin -- #period.end
+    ] else [
+      === #t("period") #period.begin
+    ]
+  ]
 
   #invoice_details(invoice_info)
 
@@ -261,4 +289,60 @@ The VAT is to be paid by the recipient of the service.",
   #block(height: 0cm)
 
   #invoice_info.invoicing_party.name
+]
+
+
+// Return period with begin and end from worklog
+#let period_from_worklog(worklog) = {
+  let first = worklog.first().at(0).split(" ").at(0)
+  let last = worklog.last().at(0).split(" ").at(0)
+  if first == last {
+    (
+      begin: first,
+    )
+  } else {
+    (
+      begin: first,
+      end: last,
+    )
+  }
+}
+
+#let worklog(worklog, language) = [
+  #show link: underline
+
+  #let t(text) = tr(language, text)
+  #set table(
+    stroke: (x, y) => if y == 0 or y == worklog.len() {
+      (bottom: 0.7pt + black)
+    },
+  )
+
+  #let period = period_from_worklog(worklog)
+  #let sum = worklog.map(p => decimal(p.at(1))).sum()
+
+  #if period.keys().contains("end") [
+    = #t("worklog") #period.begin -- #period.end
+  ] else [
+    = #t("worklog") #period.begin
+  ]
+
+  #block()
+
+  #table(
+    columns: (4.0cm, 2.0cm, 11.0cm),
+    table.header(
+      [#t("date")],
+      [#t("worklog_hours")],
+      [#t("worklog_description")],
+    ),
+    ..worklog
+      .map(p => (
+        p.at(0),
+        p.at(1),
+        p.at(3),
+      ))
+      .flatten(),
+    table.cell()[*#t("worklog_total_hours"):*], [*#sum*]
+  )
 ]
