@@ -1,4 +1,4 @@
-#import "invoice.typ";
+#import "lib.typ" as invoice;
 
 
 // Create an invoice with VAT
@@ -11,7 +11,6 @@
   id: "1",
   due: "14 days",
   vat: 19.0,
-  language: "en",
   invoicing_party: toml("contacts.toml").me,
   recipient: toml("contacts.toml").client_a,
   positions: (
@@ -36,7 +35,7 @@
 // Load worklog from csv
 #let worklog_data = csv("worklog.csv")
 
-#set text(font: "JetBrains Mono", size: 10pt, lang: "de")
+#set text(font: "Dosis", size: 11pt, lang: "de")
 
 #let invoice_info = (
   date: "24.05.2025",

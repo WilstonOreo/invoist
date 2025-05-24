@@ -1,0 +1,17 @@
+[package]
+name = "invoist"
+version = "0.1.0"
+compiler = "0.10.0"
+entrypoint = "lib.typ"
+repository = "https://github.com/WilstonOreo/invoist"
+authors = ["Michael Winkelmann <@WilstonOreo>"]
+license = "MIT-0"
+description = "Translatable Invoice template for typst"
+keywords = ["invoice", "german", "banking"]
+categories = ["layout", "office"]
+disciplines = []
+
+[template]
+path = "template"
+entrypoint = "main.typ"
+thumbnail = "thumbnail.png"
