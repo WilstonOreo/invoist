@@ -71,12 +71,19 @@ The VAT is to be paid by the recipient of the service.",
 
 #let address_details(recipient) = block(width: 12cm)[
   #recipient.name \
+  #if recipient.keys().contains("contact_name") [
+    #recipient.contact_name \
+  ]
   #recipient.street \
-  #recipient.zip #recipient.city
+  #recipient.zip #recipient.city \
+  #if recipient.keys().contains("country") [
+    #recipient.country
+  ]
 ]
 
-#let invoice_details(invoice_info, invoicing_party) = place(top + left, dx: 10cm)[
-  #let t(text) = tr(invoice_info.language, text)
+#let invoice_details(invoice_info) = place(top + left, dx: 10cm)[
+  #let t(text) = tr(invoice_info.language, text);
+  #let invoicing_party = invoice_info.invoicing_party;
 
   #invoicing_party.name \
   #invoicing_party.street \
@@ -92,8 +99,9 @@ The VAT is to be paid by the recipient of the service.",
   ]
 ]
 
-#let invoice_account_details(invoice_info, invoicing_party) = align(center)[#block(width: 9cm, inset: 0.5cm)[
+#let invoice_account_details(invoice_info) = align(center)[#block(width: 9cm, inset: 0.5cm)[
     #let t(text) = tr(invoice_info.language, text)
+    #let invoicing_party = invoice_info.invoicing_party;
 
     #par(justify: true)[
       #t("account_holder"): #h(1fr) *#invoicing_party.name*\
@@ -103,7 +111,9 @@ The VAT is to be paid by the recipient of the service.",
   ]
 ]
 
-#let invoice_positions(invoice_info, positions) = [
+#let invoice_positions(invoice_info) = [
+  #let positions = invoice_info.positions;
+
   #show table.cell.where(y: 0): strong
   #set table(
     stroke: (x, y) => if y == 0 or y == positions.len() or y == positions.len() + 3 {
@@ -146,7 +156,9 @@ The VAT is to be paid by the recipient of the service.",
   )
 ]
 
-#let invoice_positions_no_tax(invoice_info, positions) = [
+#let invoice_positions_no_tax(invoice_info) = [
+  #let positions = invoice_info.positions;
+
   #show table.cell.where(y: 0): strong
   #set table(
     stroke: (x, y) => if y == 0 or y == positions.len() or y == positions.len() + 3 {
@@ -195,25 +207,25 @@ The VAT is to be paid by the recipient of the service.",
 
 
 
-#let invoice(invoice_info, invoicing_party, recipient, positions) = [
+#let invoice(invoice_info) = [
   #set text(font: "JetBrains Mono", size: 10pt)
 
   #set page(
     paper: "a4",
-    footer: invoice_footer(invoicing_party),
+    footer: invoice_footer(invoice_info.invoicing_party),
   )
 
   #show link: underline
 
   #let t(text) = tr(invoice_info.language, text)
 
-  #address_details(recipient)
+  #address_details(invoice_info.recipient)
 
   #block(height: 3.5cm)
 
   = #t("invoice") #invoice_info.id
 
-  #invoice_details(invoice_info, invoicing_party)
+  #invoice_details(invoice_info)
 
   #block(height: 1cm)
 
@@ -224,9 +236,9 @@ The VAT is to be paid by the recipient of the service.",
   #block()
 
   #if invoice_info.vat > 0.0 {
-    invoice_positions(invoice_info, positions)
+    invoice_positions(invoice_info)
   } else {
-    invoice_positions_no_tax(invoice_info, positions)
+    invoice_positions_no_tax(invoice_info)
   }
 
   #block()
@@ -238,7 +250,7 @@ The VAT is to be paid by the recipient of the service.",
 
   #t("payment_instruction")
 
-  #invoice_account_details(invoice_info, invoicing_party)
+  #invoice_account_details(invoice_info)
 
   #t("thank_you")
 
@@ -248,5 +260,5 @@ The VAT is to be paid by the recipient of the service.",
 
   #block(height: 0cm)
 
-  #invoicing_party.name
+  #invoice_info.invoicing_party.name
 ]
