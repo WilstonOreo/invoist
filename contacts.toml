@@ -8,6 +8,7 @@ iban = "DE1234123412341234"
 bic = "AWESOMEBANK"
 website = "https://my.site"
 email = "me@my.site"
+vat = "DE12345456"
 
 [client_a]
 name = "A nice client"
