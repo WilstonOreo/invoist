@@ -169,8 +169,8 @@
 
 /// Display invoicing party's details in the footer
 #let invoice_footer(invoicing_party) = [
-  #align(center)[#text(7.5pt)[
-      #invoicing_party.name #sym.dot.c #invoicing_party.street #sym.dot.c #invoicing_party.zip #invoicing_party.city #sym.dot.c #invoicing_party.phone #sym.dot.c #invoicing_party.email
+  #align(center)[#text(7.0pt)[
+      #invoicing_party.name #sym.dot.c #invoicing_party.street #sym.dot.c #invoicing_party.zip #invoicing_party.city #sym.dot.c #invoicing_party.email #sym.dot.c VAT-ID: #invoicing_party.vat
     ]]
 ]
 
